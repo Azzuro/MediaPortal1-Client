@@ -107,7 +107,9 @@ Var frominstall
 Var MPTray_Running
 
 Var PREVIOUS_SKINSETTINGS_TITAN_CONFIG
+Var PREVIOUS_SKINSETTINGS_ARES_CONFIG
 Var PREVIOUS_SKINSETTINGS_DEFAULTWIDEHD_CONFIG
+Var PREVIOUS_KEYMAPSETTINGS
 
 #---------------------------------------------------------------------------
 # INCLUDE FILES
@@ -311,6 +313,12 @@ ShowUninstDetails show
     ${LOG_TEXT} "INFO" "Backup SkinSettings.xml for Titan (${COMMON_APPDATA}\skin\Titan\SkinSettings.xml)"
     CopyFiles /SILENT /FILESONLY "${COMMON_APPDATA}\skin\Titan\SkinSettings.xml" "$PREVIOUS_SKINSETTINGS_TITAN_CONFIG"
   ${EndIf}
+
+  ${If} ${FileExists} "${COMMON_APPDATA}\skin\Ares\SkinSettings.xml"
+    GetTempFileName $PREVIOUS_SKINSETTINGS_ARES_CONFIG
+    ${LOG_TEXT} "INFO" "Backup SkinSettings.xml for Ares (${COMMON_APPDATA}\skin\Ares\SkinSettings.xml)"
+    CopyFiles /SILENT /FILESONLY "${COMMON_APPDATA}\skin\Ares\SkinSettings.xml" "$PREVIOUS_SKINSETTINGS_ARES_CONFIG"
+  ${EndIf}
 !macroend
 
 !macro RestoreSkinSettings
@@ -323,6 +331,26 @@ ShowUninstDetails show
     ${LOG_TEXT} "INFO" "Restore SkinSettings.xml for Titan (${COMMON_APPDATA}\skin\Titan\SkinSettings.xml)"
     CopyFiles /SILENT /FILESONLY "$PREVIOUS_SKINSETTINGS_TITAN_CONFIG" "${COMMON_APPDATA}\skin\Titan\SkinSettings.xml" 
   ${EndIf}  
+
+  ${If} ${FileExists} "$PREVIOUS_SKINSETTINGS_ARES_CONFIG"
+    ${LOG_TEXT} "INFO" "Restore SkinSettings.xml for Ares (${COMMON_APPDATA}\skin\Ares\SkinSettings.xml)"
+    CopyFiles /SILENT /FILESONLY "$PREVIOUS_SKINSETTINGS_ARES_CONFIG" "${COMMON_APPDATA}\skin\Ares\SkinSettings.xml" 
+  ${EndIf} 
+!macroend
+
+!macro BackupKeymapSettings
+  ${If} ${FileExists} "${COMMON_APPDATA}\keymap.xml"
+    GetTempFileName $PREVIOUS_KEYMAPSETTINGS
+    ${LOG_TEXT} "INFO" "Backup keymap.xml (${COMMON_APPDATA}\keymap.xml)"
+    CopyFiles /SILENT /FILESONLY "${COMMON_APPDATA}\keymap.xml" "$PREVIOUS_KEYMAPSETTINGS"
+  ${EndIf}
+!macroend
+
+!macro RestoreKeymapSettings
+  ${If} ${FileExists} "$PREVIOUS_KEYMAPSETTINGS"
+    ${LOG_TEXT} "INFO" "Restore keymap.xml (${COMMON_APPDATA}\keymap.xml)"
+    CopyFiles /SILENT /FILESONLY "$PREVIOUS_KEYMAPSETTINGS" "${COMMON_APPDATA}\keymap.xml" 
+  ${EndIf}
 !macroend
 
 Function RunUninstaller
@@ -349,6 +377,7 @@ Section "-prepare" SecPrepare
 
   !insertmacro ShutdownRunningMediaPortalApplications
   !insertmacro BackupSkinSettings
+  !insertmacro BackupKeymapSettings
 
   ${LOG_TEXT} "INFO" "Deleting SkinCache..."
   RMDir /r "$MPdir.Cache"
@@ -652,6 +681,13 @@ Section "MediaPortal core files (required)" SecCore
   Delete "${MEDIAPORTAL.BASE}\skin\DefaultWideHD\MPDefaultFonts\Lato-Medium.ttf"
   Delete "${MEDIAPORTAL.BASE}\skin\DefaultWideHD\MPDefaultFonts\Lato-Light.ttf"
   Delete "${MEDIAPORTAL.BASE}\skin\DefaultWideHD\MPDefaultFonts\NotoSans-Regular.ttf"
+  Delete "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\AvalonType.ttf"
+  Delete "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\AvalonTypeBold.ttf"
+  Delete "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\AvalonTypeLight.ttf"
+  Delete "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\HELN.TTF"
+  Delete "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\HindVadodara-SemiBold.ttf"
+  Delete "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\Lato-Regular.ttf"
+  Delete "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\MediaPortalDefault.ttf"
 
   ; used for Default and Titan Skin Font
   StrCpy $FONT_DIR $FONTS
@@ -661,9 +697,18 @@ Section "MediaPortal core files (required)" SecCore
   !insertmacro InstallTTFFont "${MEDIAPORTAL.BASE}\skin\Titan\Fonts\Titan.ttf"
   !insertmacro InstallTTFFont "${MEDIAPORTAL.BASE}\skin\Titan\Fonts\TitanLight.ttf"
   !insertmacro InstallTTFFont "${MEDIAPORTAL.BASE}\skin\Titan\Fonts\TitanMedium.ttf"
+  !insertmacro InstallTTFFont "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\AvalonType.ttf"
+  !insertmacro InstallTTFFont "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\AvalonTypeBold.ttf"
+  !insertmacro InstallTTFFont "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\AvalonTypeLight.ttf"
+  !insertmacro InstallTTFFont "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\HELN.TTF"
+  !insertmacro InstallTTFFont "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\HindVadodara-SemiBold.ttf"
+  !insertmacro InstallTTFFont "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\Lato-Regular.ttf"
+  !insertmacro InstallTTFFont "${MEDIAPORTAL.BASE}\skin\Ares\MPDefaultFonts\MediaPortalDefault.ttf"
+
   SendMessage ${HWND_BROADCAST} ${WM_FONTCHANGE} 0 0 /TIMEOUT=1000
   
   !insertmacro RestoreSkinSettings
+  !insertmacro RestoreKeymapSettings
 
 SectionEnd
 !macro Remove_${SecCore}
