@@ -1,5 +1,0 @@
-LIBRARY     mpiptv_http.dll
-
-EXPORTS
-			CreateProtocolInstance		PRIVATE
-			DestroyProtocolInstance		PRIVATE

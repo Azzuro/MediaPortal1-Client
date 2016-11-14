@@ -1,5 +1,0 @@
-LIBRARY     mpiptv_rtsp.dll
-
-EXPORTS
-			CreateProtocolInstance		PRIVATE
-			DestroyProtocolInstance		PRIVATE
